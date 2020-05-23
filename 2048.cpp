@@ -5,6 +5,8 @@
 #include <string>
 #include <unistd.h>
 #include <ctime>
+#include <vector>
+#include <curses.h>
 
 using namespace std;
 
@@ -15,10 +17,10 @@ using namespace std;
 std::string Game_2048::getHorizontalBorder()
 {
     string ans = "";
-    for (int i = 0; i < 4 * COL + 1; ++i)
+    for (int i = 0; i < 4 + (COL - 1) * 3; ++i)
         ans += "-";
     int length = this->maxValueLength();
-    for (int i = 0; i < length * ROW; ++i)
+    for (int i = 0; i < length * COL; ++i)
        ans += "-";
     return ans;
 }
@@ -167,18 +169,21 @@ void Game_2048::right()
 void Game_2048::draw()
 {
     // Linux
-    system("clear");
+    clear();
+    vector<string> rowStr;
     int length = this->maxValueLength();
     for (int i = 0; i < 2 * ROW + 1; ++i)
     {
         if (i % 2 == 0)
         {
-            cout << this->getHorizontalBorder();
+            rowStr.push_back(this->getHorizontalBorder());
+            // cout << this->getHorizontalBorder();
         }
         else
         {
+            string _row = "";
             int row = i / 2;
-            cout << "|";
+            _row += "|";
             for (int j = 0; j < COL; ++j)
             {
                 string tmp;
@@ -199,10 +204,22 @@ void Game_2048::draw()
                         tmp = _t + tmp;
                     }
                 }
-                cout << " "  << tmp << " |";
+                _row = _row + " " + tmp + " |";
+            }
+            rowStr.push_back(_row);
+        }
+        
+        int idx = 0;
+        for (auto r: rowStr)
+        {
+            // cout << r;
+            move(s_y + idx++, s_x);
+            for (auto ch: r)
+            {
+                addch(ch);
             }
         }
-        cout << endl;
+        refresh();
     }
 }
 
@@ -248,15 +265,15 @@ void Game_2048::run()
 {
 START:
     this->clean();
-    system("clear");
-    cout << "\t\tGAME 2048" << endl;
-    cout << "\t\tSelect mode" << endl;
-    cout << "\t\t1. 2048 " << endl;
-    cout << "\t\t2. Endless " << endl;
-    cout << "\t\tq. Quit " << endl;
-
-    char key = 0;
-    cin >> key;
+    clear();
+    mvaddstr(s_y + 0, s_x - 10, "\t\tGAME 2048\n");
+    mvaddstr(s_y + 1, s_x - 10, "\t\tSelect mode");
+    mvaddstr(s_y + 2, s_x - 10, "\t\t1. 2048 ");
+    mvaddstr(s_y + 3, s_x - 10, "\t\t2. Endless ");
+    mvaddstr(s_y + 4, s_x - 10, "\t\tq. Quit ");
+    refresh();
+    int key = 0;
+    key = getch();
     switch (key) {
         case '1':
             this->endless = false;
@@ -267,70 +284,93 @@ START:
         case 'q':
             return;
         default:
-            cout << "Please Input 1 or 2 ! Press any key to continue" << endl;
-            cin >> key;
+            mvaddstr(s_y + 6, s_x -18, "Please Input 1 or 2 ! Press any key to continue");
+            getch();
             goto START;
 
     }
 
+    refresh();
     generate();
     generate();
     draw();
-    while (true)
+
+    do
     {
-        char key = 0;
-        while (cin >> key)
+        key = getch();
+        switch (key)
         {
-            switch (key)
-            {
-            case 'w':
-                this->up();
-                break;
-            case 's':
-                this->down();
-                break;
-            case 'd':
-                this->right();
-                break;
-            case 'a':
-                this->left();
-                break;
-            case 'q':
-                system("clear");
-                return;
-            default:
-                break;
-            }
-            if (this->endless==false && this->maxValue() == 2048)
-            {
-                cout << "\t You Sucess !!!" << endl;
-                cout << "\t Press r to play again. " << endl;
-                cin >> key;
-                if (key == 'r')
-                    goto START;
-                return;
-            }
-            if (this->check())
-            {
-                this->generate();
-                this->draw();
-            }
-            else
-            {
-                cout << "\tGame Over !!! \n" 
-                     << "\tScore: " << this->maxValue()  << "\n"
-                     << "\tPress r to Play Again. Press q to quit or Ctrl-c" << endl;
-                cin >> key;
-                if (key == 'r')
-                    goto START;
-                return;
-            }   
+        case KEY_UP:
+            this->up();
+            break;
+        case KEY_DOWN:
+            this->down();
+            break;
+        case KEY_RIGHT:
+            this->right();
+            break;
+        case KEY_LEFT:
+            this->left();
+            break;
+        case 'q':
+            clear();
+            return;
+        default:
+            continue;
         }
-    }
+
+        if (this->endless==false && this->maxValue() == 2048)
+        {
+            printw("\t You Sucess !!! \n");
+            printw("\t Press r to play again. \n");
+            key = getch();
+            if (key == 'r')
+                goto START;
+            return;
+        }
+        if (this->check())
+        {
+            this->generate();
+            this->draw();
+        }
+        else
+        {
+            printw("\n\t GAME OVER !!! \n\tScore: %d\n\tPress r to Play Again\n", this->maxValue());
+            key = getch();
+            if (key == 'r')
+                goto START;
+            return;
+        }  
+
+    } while (1);
+}
+
+void Game_2048::setStartPos(int y, int x)
+{
+    this->s_x = x - 8;
+    this->s_y = y - 10;
+}
+
+void init()
+{
+    initscr();
+    cbreak();
+    nonl();
+    noecho();
+    intrflush(stdscr, true);
+    keypad(stdscr, true);
+    curs_set(0);
+    refresh();
 }
 
 int main()
 {
+    init();
     Game_2048 game;
+    int y, x;
+    getmaxyx(stdscr, y, x);
+    game.setStartPos(y / 2, x / 2);
     game.run();
+    refresh();
+    endwin();
 }
