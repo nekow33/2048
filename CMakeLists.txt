@@ -1,3 +1,6 @@
 project(Game_2048)
 set(SRC_LIST 2048.h 2048.cpp)
-add_executable(2048 ${SRC_LIST})
+include_directories( $(CURSES_INCLUDE_DIRS) )
+find_package(Curses REQUIRED)
+add_executable(Game_2048 $(SRC_LIST))
+target_link_libraries(Game_2048 $(CURSES_LIBRARIES))
