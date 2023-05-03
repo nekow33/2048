@@ -28,12 +28,11 @@ std::string Game_2048::getHorizontalBorder()
 int Game_2048::maxValueLength()
 {
     int mx = pos[0][0];
-    for (int i = 0; i < ROW; ++i)
-    {
-        for (int j = 0; j < COL; ++j)
-        {
-            if (mx < pos[i][j])
+    for (int i = 0; i < ROW; ++i) {
+        for (int j = 0; j < COL; ++j) {
+            if (mx < pos[i][j]) {
                 mx = pos[i][j];
+            }
         }
     }
     return to_string(mx).size();
@@ -42,10 +41,8 @@ int Game_2048::maxValueLength()
 int Game_2048::maxValue()
 {
     int ans = 0;
-    for (int i = 0; i < ROW; ++i)
-    {
-        for (int j = 0; j < COL; ++j)
-        {
+    for (int i = 0; i < ROW; ++i) {
+        for (int j = 0; j < COL; ++j) {
             ans = ans < pos[i][j] ? pos[i][j] : ans;
         }
     }
@@ -54,24 +51,18 @@ int Game_2048::maxValue()
 
 void Game_2048::up()
 {
-    for (int col = 0; col < COL; ++col)
-    {
-        for (int i = 0; i < ROW; ++i)
-        {
+    for (int col = 0; col < COL; ++col) {
+        for (int i = 0; i < ROW; ++i) {
             int t = pos[i][col];
             int j = i + 1;
             while (j < ROW && pos[j][col] == 0)
                 ++j;
-            if (j < ROW)
-            {
-                if (t == 0)
-                {
+            if (j < ROW) {
+                if (t == 0) {
                     pos[i][col] = pos[j][col];
                     pos[j][col] = 0;
                     i -= 1;
-                }
-                else if (t == pos[j][col])
-                {
+                } else if (t == pos[j][col]) {
                     pos[i][col] *= 2;
                     pos[j][col] = 0;
                 }
@@ -82,24 +73,18 @@ void Game_2048::up()
 
 void Game_2048::down()
 {
-    for (int col = 0; col < COL; ++col)
-    {
-        for (int i = ROW - 1; i >= 0; --i)
-        {
+    for (int col = 0; col < COL; ++col) {
+        for (int i = ROW - 1; i >= 0; --i) {
             int t = pos[i][col];
             int j = i - 1;
             while (j >= 0 && pos[j][col] == 0)
                 --j;
-            if (j >= 0)
-            {
-                if (t == 0)
-                {
+            if (j >= 0) {
+                if (t == 0) {
                     pos[i][col] = pos[j][col];
                     pos[j][col] = 0;
                     i += 1;
-                }
-                else if (pos[j][col] == t)
-                {
+                } else if (pos[j][col] == t) {
                     pos[i][col] *= 2;
                     pos[j][col] = 0;
                 }
@@ -110,54 +95,40 @@ void Game_2048::down()
 
 void Game_2048::left()
 {
-    for (int row = 0; row < ROW; ++row)
-    {
-        for (int i = 0; i < COL; ++i)
-        {
+    for (int row = 0; row < ROW; ++row) {
+        for (int i = 0; i < COL; ++i){
             int t = pos[row][i];
             int j = i + 1;
             while (j < COL && pos[row][j] == 0)
                 ++j;
-            if (j < COL)
-            {
-                if (t==0)
-                {
+            if (j < COL) {
+                if (t==0){
                     pos[row][i] = pos[row][j];
                     pos[row][j] = 0;
                     i -= 1;
-                }
-                else if (pos[row][j] == t)
-                {
+                } else if (pos[row][j] == t) {
                     pos[row][i] *= 2;
                     pos[row][j] = 0;
                 }
             }
-
         }
-    
     }
 }
 
 void Game_2048::right()
 {
-    for (int row = 0; row < ROW; ++row)
-    {
-        for (int i = COL - 1; i >= 0; --i)
-        {
+    for (int row = 0; row < ROW; ++row) {
+        for (int i = COL - 1; i >= 0; --i){
             int t = pos[row][i];
             int j = i - 1;
             while (j >= 0 && pos[row][j] == 0)
                 --j;
-            if (j >= 0)
-            {
-                if (t == 0)
-                {
+            if (j >= 0) {
+                if (t == 0) {
                     pos[row][i] = pos[row][j];
                     pos[row][j] = 0;
                     i += 1;
-                }
-                else if (pos[row][j] == t)
-                {
+                } else if (pos[row][j] == t) {
                     pos[row][i] *= 2;
                     pos[row][j] = 0;
                 }
@@ -172,32 +143,22 @@ void Game_2048::draw()
     clear();
     vector<string> rowStr;
     int length = this->maxValueLength();
-    for (int i = 0; i < 2 * ROW + 1; ++i)
-    {
-        if (i % 2 == 0)
-        {
+    for (int i = 0; i < 2 * ROW + 1; ++i) {
+        if (i % 2 == 0) {
             rowStr.push_back(this->getHorizontalBorder());
-            // cout << this->getHorizontalBorder();
-        }
-        else
-        {
+        } else {
             string _row = "";
             int row = i / 2;
             _row += "|";
-            for (int j = 0; j < COL; ++j)
-            {
+            for (int j = 0; j < COL; ++j) {
                 string tmp;
-                if (pos[row][j] == 0)
-                {
+                if (pos[row][j] == 0) {
                     tmp = "";
                     for (int i = 0; i < length; ++i)
                         tmp += " ";
-                }
-                else
-                {
+                } else {
                     tmp = to_string(pos[row][j]);
-                    if (tmp.size() < length)
-                    {
+                    if (tmp.size() < length) {
                         string _t = "";
                         for (int i = 0; i < length - tmp.size(); ++i)
                             _t += " ";
@@ -210,12 +171,10 @@ void Game_2048::draw()
         }
         
         int idx = 0;
-        for (auto r: rowStr)
-        {
+        for (auto r: rowStr) {
             // cout << r;
             move(s_y + idx++, s_x);
-            for (auto ch: r)
-            {
+            for (auto ch: r) {
                 addch(ch);
             }
         }
@@ -225,10 +184,8 @@ void Game_2048::draw()
 
 bool Game_2048::check()
 {
-    for (int i = 0; i < ROW; ++i)
-    {
-        for (int j = 0; j < COL; ++j)
-        {
+    for (int i = 0; i < ROW; ++i) {
+        for (int j = 0; j < COL; ++j) {
             if (pos[i][j] == 0)
                 return true;
         }
@@ -253,8 +210,7 @@ void Game_2048::generate()
 
 void Game_2048::clean()
 {
-    for (int i = 0; i < ROW; ++i)    
-    {
+    for (int i = 0; i < ROW; ++i) {
         for (int j = 0; j < COL; ++j)
             this->pos[i][j] = 0;
     }
@@ -295,32 +251,37 @@ START:
     generate();
     draw();
 
-    do
-    {
+    do {
         key = getch();
-        switch (key)
-        {
-        case KEY_UP:
-            this->up();
-            break;
-        case KEY_DOWN:
-            this->down();
-            break;
-        case KEY_RIGHT:
-            this->right();
-            break;
-        case KEY_LEFT:
-            this->left();
-            break;
-        case 'q':
-            clear();
-            return;
-        default:
-            continue;
+        switch (key) {
+            case KEY_UP:
+            case 'k':
+            case 'w':
+                this->up();
+                break;
+            case KEY_DOWN:
+            case 'j':
+            case 's':
+                this->down();
+                break;
+            case KEY_RIGHT:
+            case 'l':
+            case 'd':
+                this->right();
+                break;
+            case KEY_LEFT:
+            case 'h':
+            case 'a':
+                this->left();
+                break;
+            case 'q':
+                clear();
+                return;
+            default:
+                continue;
         }
 
-        if (this->endless==false && this->maxValue() == 2048)
-        {
+        if (this->endless==false && this->maxValue() == 2048) {
             printw("\t You Sucess !!! \n");
             printw("\t Press r to play again. \n");
             key = getch();
@@ -328,20 +289,17 @@ START:
                 goto START;
             return;
         }
-        if (this->check())
-        {
+        
+        if (this->check()) {
             this->generate();
             this->draw();
-        }
-        else
-        {
+        } else {
             printw("\n\t GAME OVER !!! \n\tScore: %d\n\tPress r to Play Again\n", this->maxValue());
             key = getch();
             if (key == 'r')
                 goto START;
             return;
-        }  
-
+        }
     } while (1);
 }
 
